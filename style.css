@@ -3,8 +3,63 @@ body {
     font-family: Arial, sans-serif;
 }
 
+
+h1 {
+    font-size: 24px;
+}
+
+
+#gameContainer {
+    max-width: 600px; /* Limit the width for larger screens */
+    margin: auto;
+    padding: 20px;
+}
+
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f3f3f3;
+}
+
+
+#toggleButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 32px;
+    font-size: 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+#toggleButton:hover {
+    background-color: #45a049;
+}
+
+
+#webcam-container {
+    position: relative;
+    width: 640px; /* Same as your video width */
+    height: 480px; /* Same as your video height */
+    margin: auto;
+}
+
 #myVidPlayer {
-            width: 640px;
-            height: 480px;
-            border: 1px solid black;
-        }
+    width: 100%;
+    height: auto;
+    border: 1px solid black;
+}
+
+#countdown {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: #fff;
+    text-shadow: 2px 2px 4px #000;
+    font-weight: bold;
+}
