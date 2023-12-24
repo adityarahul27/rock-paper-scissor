@@ -1,7 +1,8 @@
 let net;
 let scorePlayer = 0;
 let scoreComputer = 0;
-
+let countdownInterval;
+let isGameRunning = false;
 // Function to simulate the computer's choice
 function computerPlay() {
   const choices = ['Rock', 'Paper', 'Scissor'];
@@ -27,11 +28,16 @@ function decideWinner(playerChoice, computerChoice) {
   }
 }
 
+
+
+
 // Function to update the scoreboard
 function updateScoreboard() {
   const scoreboard = document.getElementById('scoreboard');
   scoreboard.textContent = `Player: ${scorePlayer} - Computer: ${scoreComputer}`;
 }
+
+
 
 async function app() {
   console.log('Loading model..');
@@ -51,6 +57,24 @@ async function app() {
   function loop() {
     webcam.update();
     window.requestAnimationFrame(loop);
+  }
+
+
+  function startCountdown() {
+    let countdown = 3;
+    const countdownElement = document.getElementById('countdown');
+    countdownElement.innerText = countdown; // Display initial countdown value
+
+    countdownInterval = setInterval(() => {
+        countdown -= 1;
+        countdownElement.innerText = countdown;
+
+        if (countdown <= 0) {
+            clearInterval(countdownInterval);
+            countdownElement.innerText = '';
+            predict(); // Start the game round
+        }
+    }, 1000); // 1000 milliseconds = 1 second
   }
 
   // Predict the gesture
@@ -79,10 +103,38 @@ async function app() {
     document.getElementById('result').textContent = resultMessage;
 
     updateScoreboard();
+    setTimeout(startCountdown, 3000);
   }
 
-  document.getElementById('startButton').addEventListener('click', predict);
+  function toggleGame() {
+    const toggleButton = document.getElementById('toggleButton');
+
+    if (!isGameRunning) {
+        // Start the game
+        isGameRunning = true;
+        toggleButton.innerText = 'Stop Game';
+        startCountdown();
+    } else {
+        // Stop the game
+        isGameRunning = false;
+        toggleButton.innerText = 'Start Game';
+
+        if (countdownInterval) {
+            clearInterval(countdownInterval);
+            document.getElementById('countdown').innerText = '';
+        }
+
+        // Additional logic to handle game stop
+        // e.g., reset the game state, clear results, etc.
+    }
+  }
+
+  document.getElementById('toggleButton').addEventListener('click', toggleGame);
 }
+
+
+
+
 
 
 document.addEventListener('DOMContentLoaded', (event) => {
