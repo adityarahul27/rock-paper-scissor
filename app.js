@@ -1,6 +1,8 @@
 let net;
-let scorePlayer = 0;
-let scoreComputer = 0;
+let playerScore = 0;
+let computerScore = 0;
+let roundsPlayed = 0;
+const totalRounds = 5;
 let countdownInterval;
 let isGameRunning = false;
 // Function to simulate the computer's choice
@@ -20,24 +22,19 @@ function decideWinner(playerChoice, computerChoice) {
     (playerChoice === 'Scissor' && computerChoice === 'Paper') ||
     (playerChoice === 'Paper' && computerChoice === 'Rock')
   ) {
-    scorePlayer++;
+    playerScore++;
     return 'player';
   } else {
-    scoreComputer++;
+    computerScore++;
     return 'computer';
   }
 }
 
-
-
-
 // Function to update the scoreboard
 function updateScoreboard() {
   const scoreboard = document.getElementById('scoreboard');
-  scoreboard.textContent = `Player: ${scorePlayer} - Computer: ${scoreComputer}`;
+  scoreboard.textContent = `Player: ${playerScore} : Computer: ${computerScore}`;
 }
-
-
 
 async function app() {
   console.log('Loading model..');
@@ -61,7 +58,7 @@ async function app() {
 
 
   function startCountdown() {
-    let countdown = 3;
+    let countdown = 5;
     const countdownElement = document.getElementById('countdown');
     countdownElement.innerText = countdown; // Display initial countdown value
 
@@ -80,7 +77,7 @@ async function app() {
   // Predict the gesture
   async function predict() {
     console.log("Button is clicked")
-
+    document.getElementById('round').textContent = `Round ${roundsPlayed + 1}`;
     const prediction = await net.predict(webcam.canvas);
     // Find the prediction with the highest probability
     let highestProbability = 0;
@@ -97,27 +94,56 @@ async function app() {
     console.log(`Predicted choice: ${playerChoice} with probability ${highestProbability}`);
     const computerChoice = computerPlay();
     const winner = decideWinner(playerChoice, computerChoice);
-    
-    let resultMessage = `Player chooses ${playerChoice}. Computer chooses ${computerChoice}. `;
-    resultMessage += winner === 'draw' ? "It's a draw." : `The ${winner} wins this round.`;
-    document.getElementById('result').textContent = resultMessage;
-
     updateScoreboard();
-    setTimeout(startCountdown, 3000);
+    
+    roundsPlayed++;
+
+    let resultMessage = `Player chooses ${playerChoice}. Computer chooses ${computerChoice}. `;
+    if (roundsPlayed >= totalRounds) {
+        // Game over, declare the winner
+        let winner;
+        if (playerScore > computerScore) {
+            winner = 'Player';
+        } else if (computerScore > playerScore) {
+            winner = 'Computer';
+        } else {
+            winner = 'No one, it\'s a draw';
+        }        
+        resultMessage += winner === 'draw' ? "It's a draw." : `The ${winner} wins this game.`;
+        document.getElementById('result').textContent = resultMessage; 
+        resetGame();
+    } else {
+        // Start the countdown for the next round
+        resultMessage += winner === 'draw' ? "It's a draw." : `The ${winner} wins this round.`;
+        document.getElementById('result').textContent = resultMessage;
+        updateScoreboard();
+        startCountdown();
+    }
+  }
+
+  function resetGame() {
+    playerScore = 0;
+    computerScore = 0;
+    roundsPlayed = 0;
+    isGameRunning = false;
+    document.getElementById('toggleButton').innerText = 'Start';
+    
   }
 
   function toggleGame() {
     const toggleButton = document.getElementById('toggleButton');
-
+    document.getElementById('round').innerText = '';
+    document.getElementById('scoreboard').innerText = '';
+    document.getElementById('result').innerText = '';
     if (!isGameRunning) {
         // Start the game
         isGameRunning = true;
-        toggleButton.innerText = 'Stop Game';
+        toggleButton.innerText = 'Stop';
         startCountdown();
     } else {
         // Stop the game
         isGameRunning = false;
-        toggleButton.innerText = 'Start Game';
+        toggleButton.innerText = 'Start';
 
         if (countdownInterval) {
             clearInterval(countdownInterval);
@@ -131,10 +157,6 @@ async function app() {
 
   document.getElementById('toggleButton').addEventListener('click', toggleGame);
 }
-
-
-
-
 
 
 document.addEventListener('DOMContentLoaded', (event) => {
